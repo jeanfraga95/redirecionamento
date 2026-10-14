@@ -1,0 +1,18 @@
+{
+  "servers": {
+    "Servidor1": {
+      "host": "COLOQUE_O_IP_DO_SERVIDOR1",
+      "port": 8080,
+      "secure": false,
+      "path": "/",
+      "header": "Backend: servidor1"
+    },
+    "Servidor2": {
+      "host": "COLOQUE_O_IP_DO_SERVIDOR2",
+      "port": 8080,
+      "secure": false,
+      "path": "/",
+      "header": "Backend: servidor2"
+    }
+  }
+}

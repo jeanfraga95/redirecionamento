@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!--
+  O GitHub Pages serve este arquivo quando o path nao existe como pasta/arquivo,
+  ex.: /redirecionamento/Servidor1 -> 404.html (status 404, mas o navegador executa o JS).
+  Assim conseguimos redirecionar por path sem criar uma pasta por servidor.
+-->
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redirecionando...</title>
+</head>
+<body>
+<p id="msg">Redirecionando...</p>
+<script>
+(function () {
+  var segs = location.pathname.split('/').filter(Boolean);
+  var key = decodeURIComponent(segs[segs.length - 1] || '');
+  if (!key) { location.replace('./'); return; }
+
+  function target(s) {
+    var scheme = s.secure ? 'https://' : 'http://';
+    var port = s.port ? (':' + s.port) : '';
+    return scheme + s.host + port + (s.path || '/');
+  }
+
+  fetch('./servers.json', { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (cfg) {
+      var servers = cfg.servers || {};
+      var match = servers[key] || servers[Object.keys(servers).filter(function (n) {
+        return n.toLowerCase() === key.toLowerCase();
+      })[0]];
+      if (match) location.replace(target(match));
+      else document.getElementById('msg').textContent = 'Path desconhecido: /' + key;
+    })
+    .catch(function () { document.getElementById('msg').textContent = 'Path desconhecido: /' + key; });
+})();
+</script>
+</body>
+</html>

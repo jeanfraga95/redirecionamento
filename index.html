@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redirecionamento</title>
+<style>
+  body{font-family:system-ui,Segoe UI,Arial,sans-serif;margin:0;background:#0f1115;color:#e6e6e6;
+       display:flex;min-height:100vh;align-items:center;justify-content:center}
+  main{max-width:560px;padding:24px}
+  h1{font-size:20px;margin:0 0 8px}
+  p{color:#9aa4b2;line-height:1.5}
+  code{background:#1b1f27;padding:2px 6px;border-radius:6px;color:#7ee787}
+  ul{line-height:1.9}
+  a{color:#58a6ff}
+  .err{color:#ff7b72}
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title">Redirecionamento</h1>
+  <p id="msg">Lendo a configuração...</p>
+  <ul id="list"></ul>
+</main>
+
+<script>
+// Mapeia o path acessado (ex.: /redirecionamento/Servidor1) para o servidor alvo.
+// ATENÇÃO: isto é um redirecionamento de NAVEGADOR (client-side). Nao e proxy.
+(function () {
+  var segs = location.pathname.split('/').filter(Boolean);
+  var key = decodeURIComponent(segs[segs.length - 1] || '');
+
+  function target(s) {
+    var scheme = s.secure ? 'https://' : 'http://';
+    var port = s.port ? (':' + s.port) : '';
+    var path = s.path || '/';
+    return scheme + s.host + port + path;
+  }
+
+  fetch('./servers.json', { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (cfg) {
+      var servers = cfg.servers || {};
+      var names = Object.keys(servers);
+      var list = document.getElementById('list');
+      names.forEach(function (n) {
+        var li = document.createElement('li');
+        li.innerHTML = '/' + n + ' &rarr; <code>' + target(servers[n]) + '</code>';
+        list.appendChild(li);
+      });
+
+      if (!key) {
+        document.getElementById('msg').textContent = 'Escolha um path:';
+        return;
+      }
+
+      var s = servers[key] || servers[names.filter(function (n) {
+        return n.toLowerCase() === key.toLowerCase();
+      })[0]];
+
+      if (s) {
+        var url = target(s);
+        document.getElementById('msg').innerHTML =
+          'Redirecionando <code>/' + key + '</code> para <code>' + url + '</code>...';
+        location.replace(url);
+      } else {
+        document.getElementById('msg').innerHTML =
+          '<span class="err">Path desconhecido:</span> /' + key;
+      }
+    })
+    .catch(function (e) {
+      document.getElementById('msg').innerHTML =
+        '<span class="err">Falha ao ler servers.json:</span> ' + e;
+    });
+})();
+</script>
+</body>
+</html>

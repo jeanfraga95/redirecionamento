@@ -1,0 +1,63 @@
+# Proxy reverso real com nginx (roteia por path e/ou header "Backend")
+#
+# Coloque no seu VPS (o servidor que tem IP publico).
+# O cliente aponta para o dominio deste nginx; ele encaminha para o IP/porta
+# do backend certo, injeta o header Backend e faz ponte de WebSocket.
+#
+# Teste:  wss://SEU_DOMINIO/Servidor1/...
+
+# 1) Mapa por HEADER "Backend"
+map $http_backend $upstream_from_header {
+    default    "";
+    servidor1  "10.0.0.11:8080";
+    servidor2  "10.0.0.12:8080";
+}
+
+# 2) Mapa por PATH (/Servidor1/...)
+map $uri $upstream_from_path {
+    default    "";
+    ~^/Servidor1(/|$)  "10.0.0.11:8080";
+    ~^/Servidor2(/|$)  "10.0.0.12:8080";
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name seu-dominio.com;
+
+    ssl_certificate     /etc/letsencrypt/live/seu-dominio.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/seu-dominio.com/privkey.pem;
+
+    # Escolhe o upstream: header tem prioridade, senao path
+    set $backend "$upstream_from_header";
+    if ($backend = "") {
+        set $backend "$upstream_from_path";
+    }
+
+    location / {
+        # bloqueia se nenhum backend foi identificado
+        if ($backend = "") { return 404; }
+
+        proxy_pass http://$backend;
+        proxy_http_version 1.1;
+
+        # --- WebSocket / reverse proxy ---
+        proxy_set_header Upgrade    $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout  3600s;
+        proxy_send_timeout  3600s;
+        proxy_buffering     off;
+
+        # --- headers encaminhados ---
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # injeta/reescreve o header Backend usado para escolher o servidor
+        proxy_set_header Backend $http_backend;
+
+        # remove o prefixo do path, se quiser que o backend receba "/"
+        # rewrite ^/Servidor[0-9]+(/.*)$ $1 break;
+    }
+}
