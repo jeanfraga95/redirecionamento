@@ -8,7 +8,7 @@
       "header": "Backend: servidor1"
     },
     "rvsnet": {
-      "host": "COLOQUE_O_IP_DO_SERVIDOR2",
+      "host": "167.126.9.217",
       "port": 80,
       "secure": false,
       "path": "/rvsnet",
