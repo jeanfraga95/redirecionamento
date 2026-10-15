@@ -12,8 +12,8 @@
 // ============================================================
 
 const BACKENDS = {
-  servidor1: { host: "COLOQUE_O_IP_DO_SERVIDOR1", port: 8080, secure: false },
-  servidor2: { host: "COLOQUE_O_IP_DO_SERVIDOR2", port: 8080, secure: false },
+  cloudjf: { host: "134.65.24.126", port: 80, secure: false },
+  rvsnet: { host: "COLOQUE_O_IP_DO_SERVIDOR2", port: 80, secure: false },
 };
 
 // Opcional: se o path tiver prefixo (ex.: /redirecionamento/Servidor1), informe aqui.
