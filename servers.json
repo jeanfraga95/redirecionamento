@@ -1,17 +1,17 @@
 {
   "servers": {
-    "Servidor1": {
-      "host": "COLOQUE_O_IP_DO_SERVIDOR1",
-      "port": 8080,
+    "cloudjf": {
+      "host": "134.65.24.126",
+      "port": 80,
       "secure": false,
-      "path": "/",
+      "path": "/cloudjf",
       "header": "Backend: servidor1"
     },
-    "Servidor2": {
+    "rvsnet": {
       "host": "COLOQUE_O_IP_DO_SERVIDOR2",
-      "port": 8080,
+      "port": 80,
       "secure": false,
-      "path": "/",
+      "path": "/rvsnet",
       "header": "Backend: servidor2"
     }
   }
