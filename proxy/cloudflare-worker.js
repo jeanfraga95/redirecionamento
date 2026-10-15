@@ -13,7 +13,7 @@
 
 const BACKENDS = {
   cloudjf: { host: "134.65.24.126", port: 80, secure: false },
-  rvsnet: { host: "COLOQUE_O_IP_DO_SERVIDOR2", port: 80, secure: false },
+  rvsnet: { host: "167.126.9.217", port: 80, secure: false },
 };
 
 // Opcional: se o path tiver prefixo (ex.: /redirecionamento/Servidor1), informe aqui.
